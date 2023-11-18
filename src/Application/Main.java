@@ -1,9 +1,12 @@
 package Application;
 
 import Model.Entities.Reservation;
+import Model.Exceptions.DomainException;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.InputMismatchException;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -21,17 +24,14 @@ public class Main {
         Reservation teste = new Reservation(3,checkInTeste,checkOutTeste);
         System.out.println(teste);
          */
+        try {
+            System.out.print("Room number: ");
+            int number = sc.nextInt();
+            System.out.print("Check-in date (dd/MM/yyyy): ");
+            LocalDate checkIn = LocalDate.from(dtFormatter.parse(sc.next()));
+            System.out.print("Check-out date (dd/MM/yyyy): ");
+            LocalDate checkOut = LocalDate.from(dtFormatter.parse(sc.next()));
 
-        System.out.print("Room number: ");
-        int number = sc.nextInt();
-        System.out.print("Check-in date (dd/MM/yyyy): ");
-        LocalDate checkIn = LocalDate.from(dtFormatter.parse(sc.next()));
-        System.out.print("Check-out date (dd/MM/yyyy): ");
-        LocalDate checkOut = LocalDate.from(dtFormatter.parse(sc.next()));
-
-        if (!checkOut.isAfter(checkIn)) {
-            System.out.println("Error in reservation: Check-out date must be after check-in date");
-        } else {
             Reservation reservation = new Reservation(number, checkIn, checkOut);
             System.out.println("Reservation: " + reservation);
 
@@ -41,12 +41,12 @@ public class Main {
             System.out.print("Check-out date (dd/MM/yyyy): ");
             checkOut = LocalDate.from(dtFormatter.parse(sc.next()));
 
-            String error = reservation.updateDates(checkIn, checkOut);
-            if (error != null) {
-                System.out.println("Error in reservation: " + error);
-            } else {
-                System.out.println("Reservation: " + reservation);
-            }
+            reservation.updateDates(checkIn, checkOut);
+            System.out.println("Reservation: " + reservation);
+        } catch (DomainException e) {
+            System.out.println("Error in reservation: " + e.getMessage());
+        } catch (RuntimeException e) { // Usamos upcasting pois herancas possuem alem disso herancas e toda excecao que "quebraria nosso progama" apenas retorna um sysout
+            System.out.println("Unexcpected error");
         }
 
         sc.close();
